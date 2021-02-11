@@ -1,26 +1,28 @@
 /**
- * 3. diff between inverse and pseudeinverse
  * 4. read input matrices from file
+ * 
  * 
  * 
  */
 #include <iostream>
 #include <Eigen/Dense>
 
+#include "src/utils.h"
+
 int main(int argc, char *argv[]){
     
     // generating data
-    Eigen::MatrixXd A(3,3);
+    Eigen::MatrixXd A(3,4);
     Eigen::VectorXd b(3);
     Eigen::VectorXd x(3);
 
-    A << 1, 3, -2,
-        2, 6, -4,
-        2, 4, 3;
+    A << 1, 3, -2, 4,
+        2, 6, -4, 4,
+        2, 4, 3, 4;
     b << 5, 7, 8;
 
-    if(A.rows() != A.cols() ||  A.rows() < 2){
-        std::cerr << "Cannot process rectangular or single element matrices" << std::endl;
+    if(!if_square(A) || A.rows() < 2){
+        std::cerr << "Cannot process rectangular or single element matrix" << std::endl;
         return -1;
     }
 
@@ -29,8 +31,6 @@ int main(int argc, char *argv[]){
         std::cerr << "Cannot process not a full rank matrix" << std::endl;
         return -1;
     }
-
-
 
     // solving
     if(lu_decomp.isInvertible()){
