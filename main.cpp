@@ -1,9 +1,7 @@
 /**
- * 0. We need to solve Ax=b for cases where only a unique solution exists i.e if A.shape = [m,n] then m=n and A is full rank matrix
- * 2. hardcode input A and b
- * 1. create CMakeLists.txt, add Eigen as dependency
- * 3. write simplest solution (x=A_(-1)*b)
- * 4. check that solution is correct
+ * 3. diff between inverse and pseudeinverse
+ * 4. read input matrices from file
+ * 
  * 
  */
 #include <iostream>
@@ -17,12 +15,30 @@ int main(int argc, char *argv[]){
     Eigen::VectorXd x(3);
 
     A << 1, 3, -2,
-        3, 5, 6,
+        2, 6, -4,
         2, 4, 3;
     b << 5, 7, 8;
 
+    if(A.rows() != A.cols() ||  A.rows() < 2){
+        std::cerr << "Cannot process rectangular or single element matrices" << std::endl;
+        return -1;
+    }
+
+    Eigen::FullPivLU<Eigen::MatrixXd> lu_decomp(A);
+    if(lu_decomp.rank() != A.rows()){
+        std::cerr << "Cannot process not a full rank matrix" << std::endl;
+        return -1;
+    }
+
+
+
     // solving
-    x = A.completeOrthogonalDecomposition().pseudoInverse() * b;
+    if(lu_decomp.isInvertible()){
+        x = lu_decomp.inverse() * b;
+    } else {
+        x = A.completeOrthogonalDecomposition().pseudoInverse() * b; // todo: that should be used when matrix
+    }
+    
 
     // check solution
     Eigen::VectorXd x_hat = A*x;
